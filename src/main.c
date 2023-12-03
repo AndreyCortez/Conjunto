@@ -1,6 +1,64 @@
 #include "set.h"
+#include "avl.h"
+#include "item.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+// Funções para alternar entre o teste da AVL e o teste do set
+// NÂO DEIXE OS DOIS DEFINIDOS AO MSM TEMPO, O PROGRAMA NÂO VAI COMPILAR!!!!!
+#define TEST_AVL
+// #define TEST_SET
+
+#ifdef TEST_AVL
+
+int main()
+{
+    // Criar uma árvore AVL
+    AVL *minha_avl = avl_criar();
+
+    // Inserir elementos na árvore
+    avl_inserir(minha_avl, 5);
+    avl_inserir(minha_avl, 3);
+    avl_inserir(minha_avl, 8);
+    avl_inserir(minha_avl, 2);
+    avl_inserir(minha_avl, 4);
+    avl_inserir(minha_avl, 7);
+    avl_inserir(minha_avl, 9);
+
+    // Imprimir árvore AVL
+    printf("Árvore AVL:\n");
+    avl_imprimir(minha_avl);
+
+    // Buscar um elemento na árvore AVL
+    int chave_para_buscar = 4;
+    ITEM *resultado_busca = avl_buscar(minha_avl, chave_para_buscar);
+
+    if (resultado_busca != NULL)
+    {
+        printf("Elemento %d encontrado na árvore AVL.\n", chave_para_buscar);
+    }
+    else
+    {
+        printf("Elemento %d não encontrado na árvore AVL.\n", chave_para_buscar);
+    }
+
+    // Remover um elemento da árvore AVL
+    int chave_para_remover = 3;
+    avl_remover(minha_avl, chave_para_remover);
+
+    // Imprimir árvore AVL após a remoção
+    printf("\nÁrvore AVL após a remoção do elemento %d:\n", chave_para_remover);
+    avl_imprimir(minha_avl);
+
+    // Destruir a árvore AVL
+    avl_destruir(minha_avl);
+
+    return 0;
+}
+
+#endif
+
+#ifdef TEST_SET
 
 int main(int argc, char *argv[])
 {
@@ -67,3 +125,4 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+#endif

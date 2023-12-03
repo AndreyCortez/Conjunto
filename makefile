@@ -1,30 +1,35 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Iinc
-
-# Diretórios
+CFLAGS = -Wall -Wextra -std=c99
 SRC_DIR = src
 INC_DIR = inc
-BUILD_DIR = build
+OBJ_DIR = obj
+BIN_DIR = bin
+ZIP_FILE = projeto.zip
+EXECUTABLE = $(BIN_DIR)/projeto
 
-# Lista de arquivos
-SRC = $(wildcard $(SRC_DIR)/*.c)
-OBJ = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC))
+SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
+INC_FILES = $(wildcard $(INC_DIR)/*.h)
+OBJ_FILES = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC_FILES))
 
-# Nome do executável
-TARGET = meu_programa
+all: $(EXECUTABLE)
 
-# Regras de compilação
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-    @mkdir -p $(BUILD_DIR)
-    $(CC) $(CFLAGS) -c $< -o $@
+$(EXECUTABLE): $(OBJ_FILES) | $(BIN_DIR)
+	$(CC) $(CFLAGS) $^ -o $@
 
-$(TARGET): $(OBJ)
-    $(CC) $(CFLAGS) $(OBJ) -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INC_FILES) | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
 
-.PHONY: clean
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
 
-clean:
-    rm -rf $(BUILD_DIR) $(TARGET)
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+run: all
+	./$(EXECUTABLE)
 
 zip:
-    zip -r projeto.zip $(SRC_DIR) $(INC_DIR) Makefile relatorio.txt
+	zip -r $(ZIP_FILE) $(SRC_DIR) $(INC_DIR) Makefile
+
+clean:
+	rm -rf $(BIN_DIR) $(OBJ_DIR) $(ZIP_FILE)

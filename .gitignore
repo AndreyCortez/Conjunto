@@ -1,0 +1,13 @@
+# Ignore arquivos de compilação e pastas
+bin/
+obj/
+
+# Ignore arquivos zipados
+*.zip
+
+# Ignore pastas de configuração do VSCode
+.vscode/
+
+# Ignore arquivos de configuração do sistema
+.DS_Store
+Thumbs.db
