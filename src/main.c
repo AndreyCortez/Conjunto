@@ -51,7 +51,7 @@ int main()
     avl_imprimir(minha_avl);
 
     // Destruir a árvore AVL
-    avl_destruir(minha_avl);
+    avl_apagar(&minha_avl);
 
     return 0;
 }

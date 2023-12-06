@@ -1,345 +1,261 @@
 #include "avl.h"
 #include <stdio.h>
+#include <stdlib.h>
 
-typedef struct node_ NODE;
-
-struct node_
+typedef struct No
 {
     ITEM *item;
-    NODE *esquerda;
-    NODE *direita;
+    struct No *fesq;
+    struct No *fdir;
     int altura;
+} NO;
+
+struct avl
+{
+    NO *raiz;
+    int profundidade;
 };
 
-struct avl_
+AVL *avl_criar(void)
 {
-    NODE *raiz;
-};
-
-// Função auxiliar para criar um novo nó AVL
-NODE *avl_criar_no(int chave)
-{
-    NODE *novo_no = (NODE *)malloc(sizeof(NODE));
-    if (novo_no != NULL)
+    AVL *arvore = (AVL *)malloc(sizeof(AVL));
+    if (arvore != NULL)
     {
-        item_set_chave(novo_no->item, chave);
-        novo_no->esquerda = NULL;
-        novo_no->direita = NULL;
-        novo_no->altura = 1; // Altura inicial de um nó é 1
+        arvore->raiz = NULL;
+        arvore->profundidade = -1;
     }
-    return novo_no;
+    return arvore;
 }
 
-// Função pública para criar uma árvore AVL
-AVL *avl_criar()
-{
-    AVL *nova_avl = (AVL *)malloc(sizeof(AVL));
-    if (nova_avl != NULL)
-    {
-        nova_avl->raiz = NULL;
-    }
-    return nova_avl;
-}
-
-// Função auxiliar para destruir uma subárvore AVL
-void avl_destruir_subarvore(NODE *raiz)
+void avl_apagar_aux(NO *raiz)
 {
     if (raiz != NULL)
     {
-        avl_destruir_subarvore(raiz->esquerda);
-        avl_destruir_subarvore(raiz->direita);
+        avl_apagar_aux(raiz->fesq);
+        avl_apagar_aux(raiz->fdir);
+        item_apagar(&raiz->item);
         free(raiz);
     }
 }
 
-// Função pública para destruir a árvore AVL
-void avl_destruir(AVL *tree)
+void avl_apagar(AVL **arvore)
 {
-    if (tree != NULL)
+    avl_apagar_aux((*arvore)->raiz);
+    free(*arvore);
+    *arvore = NULL;
+}
+
+int avl_altura_no(NO *raiz)
+{
+    if (raiz == NULL)
     {
-        avl_destruir_subarvore(tree->raiz);
-        free(tree);
+        return -1;
+    }
+    else
+    {
+        return raiz->altura;
     }
 }
 
-// Função auxiliar para obter a altura de um nó
-int avl_altura(NODE *no)
+NO *avl_cria_no(ITEM *item)
 {
-    if (no == NULL)
-    {
-        return 0;
-    }
-    return no->altura;
-}
-
-// Função auxiliar para calcular o fator de balanceamento de um nó
-int avl_fator_balanceamento(NODE *no)
-{
-    if (no == NULL)
-    {
-        return 0;
-    }
-    return avl_altura(no->esquerda) - avl_altura(no->direita);
-}
-
-// Função auxiliar para atualizar a altura de um nó
-void avl_atualizar_altura(NODE *no)
-{
+    NO *no = (NO *)malloc(sizeof(NO));
     if (no != NULL)
     {
-        int altura_esquerda = avl_altura(no->esquerda);
-        int altura_direita = avl_altura(no->direita);
-        no->altura = (altura_esquerda > altura_direita ? altura_esquerda : altura_direita) + 1;
-    }
-}
-
-// Função auxiliar para rotacionar à direita em torno do nó 'y'
-NODE *avl_rotacao_direita(NODE *y)
-{
-    NODE *x = y->esquerda;
-    NODE *T2 = x->direita;
-
-    x->direita = y;
-    y->esquerda = T2;
-
-    avl_atualizar_altura(y);
-    avl_atualizar_altura(x);
-
-    return x;
-}
-
-// Função auxiliar para rotacionar à esquerda em torno do nó 'x'
-NODE *avl_rotacao_esquerda(NODE *x)
-{
-    NODE *y = x->direita;
-    NODE *T2 = y->esquerda;
-
-    y->esquerda = x;
-    x->direita = T2;
-
-    avl_atualizar_altura(x);
-    avl_atualizar_altura(y);
-
-    return y;
-}
-
-// Função principal para inserir um elemento na árvore AVL
-NODE *avl_inserir_no(NODE *no, int chave)
-{
-    // Etapa de inserção BST
-    if (no == NULL)
-    {
-        return avl_criar_no(chave);
-    }
-
-    if (chave < item_get_chave(no->item))
-    {
-        no->esquerda = avl_inserir_no(no->esquerda, chave);
-    }
-    else if (chave > item_get_chave(no->item))
-    {
-        no->direita = avl_inserir_no(no->direita, chave);
-    }
-    else
-    {
-        // Chaves iguais não são permitidas
-        return no;
-    }
-
-    // Atualizar altura do nó atual
-    avl_atualizar_altura(no);
-
-    // Calcular fator de balanceamento
-    int balanceamento = avl_fator_balanceamento(no);
-
-    // Casos de rotação
-
-    // Rotação à direita (Left-Left)
-    if (balanceamento > 1 && chave < item_get_chave(no->esquerda->item))
-    {
-        return avl_rotacao_direita(no);
-    }
-
-    // Rotação à esquerda (Right-Right)
-    if (balanceamento < -1 && chave > item_get_chave(no->direita->item))
-    {
-        return avl_rotacao_esquerda(no);
-    }
-
-    // Rotação à esquerda-direita (Left-Right)
-    if (balanceamento > 1 && chave > item_get_chave(no->esquerda->item))
-    {
-        no->esquerda = avl_rotacao_esquerda(no->esquerda);
-        return avl_rotacao_direita(no);
-    }
-
-    // Rotação à direita-esquerda (Right-Left)
-    if (balanceamento < -1 && chave < item_get_chave(no->direita->item))
-    {
-        no->direita = avl_rotacao_direita(no->direita);
-        return avl_rotacao_esquerda(no);
-    }
-
-    return no;
-}
-
-// Função pública para inserir um elemento na árvore AVL
-void avl_inserir(AVL *tree, int chave)
-{
-    if (tree != NULL)
-    {
-        tree->raiz = avl_inserir_no(tree->raiz, chave);
-    }
-}
-
-// Função auxiliar para encontrar o nó mínimo em uma árvore AVL
-NODE *avl_encontrar_minimo(NODE *no)
-{
-    while (no->esquerda != NULL)
-    {
-        no = no->esquerda;
+        no->altura = 0;
+        no->fdir = NULL;
+        no->fesq = NULL;
+        no->item = item;
     }
     return no;
 }
-
-// Função auxiliar para remover um nó em uma árvore AVL
-NODE *avl_remover_no(NODE *raiz, int chave)
+NO *rodar_direita(NO *a)
 {
-    // Etapa de remoção BST
+    NO *b = a->fesq;
+    a->fesq = b->fdir;
+    b->fdir = a;
+
+    a->altura = max(avl_altura_no(a->fesq), avl_altura_no(a->fdir)) + 1;
+    // b->altura = max(avl_altura_no(b->fesq), a->altura )+ 1;
+    return b;
+}
+
+NO *rodar_esquerda(NO *a)
+{
+    NO *b = a->fdir;
+    a->fdir = b->fesq;
+    b->fesq = a;
+    a->altura = max(avl_altura_no(a->fesq), avl_altura_no(a->fdir)) + 1;
+    // b->altura = max(avl_altura_no(b->fdir), a->altura) + 1;
+    return b;
+}
+
+NO *rodar_esquerda_direita(NO *a)
+{
+    a->fesq = rodar_esquerda(a->fesq);
+    return rodar_direita(a);
+}
+
+NO *rodar_direita_esquerda(NO *a)
+{
+    a->fdir = rodar_direita(a->fdir);
+    return rodar_esquerda(a);
+}
+
+NO *avl_inserir_no(NO *raiz, NO *no)
+{
     if (raiz == NULL)
-    {
-        return raiz;
-    }
+        raiz = no;
+    else if (item_get_chave(no->item) < item_get_chave(raiz->item))
+        raiz->fesq = avl_inserir_no(raiz->fesq, no);
+    else if (item_get_chave(no->item) > item_get_chave(raiz->item))
+        raiz->fdir = avl_inserir_no(raiz->fdir, no);
 
-    if (chave < item_get_chave(raiz->item))
-    {
-        raiz->esquerda = avl_remover_no(raiz->esquerda, chave);
-    }
-    else if (chave > item_get_chave(raiz->item))
-    {
-        raiz->direita = avl_remover_no(raiz->direita, chave);
-    }
-    else
-    {
-        // Nó encontrado, realizar a remoção
+    raiz->altura = max(avl_altura_no(raiz->fesq), avl_altura_no(raiz->fdir)) + 1;
 
-        // Nó com um filho ou nenhum filho
-        if (raiz->esquerda == NULL || raiz->direita == NULL)
-        {
-            NODE *temp = raiz->esquerda ? raiz->esquerda : raiz->direita;
-
-            // Nenhum filho
-            if (temp == NULL)
-            {
-                temp = raiz;
-                raiz = NULL;
-            }
-            else
-            {                  // Um filho
-                *raiz = *temp; // Copiar o conteúdo do nó não-nulo
-            }
-
-            free(temp);
-        }
+    if (avl_altura_no(raiz->fesq) - avl_altura_no(raiz->fdir) == -2)
+    {
+        if (item_get_chave(no->item) > item_get_chave(raiz->fdir->item))
+            raiz = rodar_esquerda(raiz);
         else
-        {
-            // Nó com dois filhos, obter o sucessor in-order (mínimo da subárvore direita)
-            NODE *temp = avl_encontrar_minimo(raiz->direita);
-
-            // Copiar o sucessor in-order para este nó
-            item_set_chave(raiz->item, item_get_chave(temp->item));
-
-            // Remover o sucessor in-order
-            raiz->direita = avl_remover_no(raiz->direita, item_get_chave(temp->item));
-        }
+            raiz = rodar_direita_esquerda(raiz);
     }
-
-    // Se a árvore tinha apenas um nó, então retornar
-    if (raiz == NULL)
+    if (avl_altura_no(raiz->fesq) - avl_altura_no(raiz->fdir) == 2)
     {
-        return raiz;
+        if (item_get_chave(no->item) < item_get_chave(raiz->fesq->item))
+            raiz = rodar_direita(raiz);
+        else
+            raiz = rodar_esquerda_direita(raiz);
     }
-
-    // Atualizar altura do nó atual
-    avl_atualizar_altura(raiz);
-
-    // Calcular fator de balanceamento
-    int balanceamento = avl_fator_balanceamento(raiz);
-
-    // Casos de rotação
-
-    // Rotação à direita (Left-Left)
-    if (balanceamento > 1 && avl_fator_balanceamento(raiz->esquerda) >= 0)
-    {
-        return avl_rotacao_direita(raiz);
-    }
-
-    // Rotação à esquerda (Right-Right)
-    if (balanceamento < -1 && avl_fator_balanceamento(raiz->direita) <= 0)
-    {
-        return avl_rotacao_esquerda(raiz);
-    }
-
-    // Rotação à esquerda-direita (Left-Right)
-    if (balanceamento > 1 && avl_fator_balanceamento(raiz->esquerda) < 0)
-    {
-        raiz->esquerda = avl_rotacao_esquerda(raiz->esquerda);
-        return avl_rotacao_direita(raiz);
-    }
-
-    // Rotação à direita-esquerda (Right-Left)
-    if (balanceamento < -1 && avl_fator_balanceamento(raiz->direita) > 0)
-    {
-        raiz->direita = avl_rotacao_direita(raiz->direita);
-        return avl_rotacao_esquerda(raiz);
-    }
-
     return raiz;
 }
 
-// Função pública para remover um elemento na árvore AVL
-void avl_remover(AVL *tree, int chave)
+bool avl_inserir(AVL *T, int chave)
 {
-    if (tree != NULL)
+    NO *novo;
+    ITEM *item = item_criar(chave);
+    if (T == NULL)
+        return (false);
+    novo = avl_cria_no(item);
+    if (novo != NULL)
     {
-        tree->raiz = avl_remover_no(tree->raiz, chave);
+        T->raiz = avl_inserir_no(T->raiz, novo);
+        return (true);
     }
+    return (false);
 }
 
-// Função auxiliar para buscar um elemento em uma subárvore AVL
-NODE *avl_buscar_no(NODE *raiz, int chave)
+NO *avl_buscar_aux(NO *n, int chave)
 {
-    if (raiz == NULL || item_get_chave(raiz->item) == chave)
-    {
-        return raiz;
-    }
+    if (n == NULL)
+        return NULL;
 
-    if (chave < item_get_chave(raiz->item))
-    {
-        return avl_buscar_no(raiz->esquerda, chave);
-    }
+    int chave_item = item_get_chave(n->item);
 
-    return avl_buscar_no(raiz->direita, chave);
+    if (chave_item == chave)
+        return n;
+
+    if (chave < chave_item)
+        return avl_buscar_aux(n->fesq, chave);
+    else
+        return avl_buscar_aux(n->fdir, chave);
 }
 
-// Função pública para buscar um elemento na árvore AVL
-ITEM *avl_buscar(AVL *tree, int chave)
+ITEM *avl_buscar(AVL *T, int chave)
 {
-    if (tree != NULL)
-    {
-        return avl_buscar_no(tree->raiz, chave)->item;
-    }
+    if (T != NULL)
+        return avl_buscar_aux(T->raiz, chave)->item;
     return NULL;
 }
 
+void avl_troca_max_esq(NO *troca, NO *raiz, NO *ant)
+{
+    if (troca->fdir != NULL)
+    {
+        avl_troca_max_esq(troca->fdir, raiz, troca);
+        return;
+    }
+
+    // Caso onde na primeira iteração da troca já
+    // não tem filho direto
+    if (raiz == ant)
+    {
+        ant->fesq = troca->fesq;
+    }
+    else
+    {
+        ant->fdir = troca->fesq;
+    }
+
+    raiz->item = troca->item;
+    free(troca);
+    troca = NULL;
+}
+
+bool avl_remover(AVL *T, int chave)
+{
+    if (T == NULL)
+        return false;
+    if (T->raiz == NULL)
+        return false;
+
+    NO *raiz = T->raiz;
+
+    NO *apg = avl_buscar_aux(raiz, chave);
+
+    if (apg == NULL)
+    {
+        return false;
+    }
+
+    // CASO 1 e 2: Nó possui um ou nenhum filho
+    if (apg->fdir == NULL || apg->fesq == NULL)
+    {
+
+        NO *p = apg;
+        if (apg->fdir != NULL)
+        {
+            apg = apg->fdir;
+        }
+        else
+        {
+            apg = apg->fesq;
+        }
+        // FIXME: tem um vazamento de memória bem aqui
+        // no_apagar(apg);
+    }
+    // CASO 3: Nó tem dois filhos
+    else
+    {
+        avl_troca_max_esq(apg->fesq, apg, apg);
+    }
+
+    // Código pra balancear a árvore (Só copiei do slide 0 chance de funcionar)
+    // raiz->altura = max(avl_altura_no(raiz->fesq), avl_altura_no(raiz->fdir)) + 1;
+
+    // if (avl_altura_no(raiz->fesq) - avl_altura_no(raiz->fdir) == -2)
+    //     if (item_get_chave(no->item) > item_get_chave(raiz->fdir->item))
+    //         raiz = rodar_esquerda(raiz);
+    //     else
+    //         raiz = rodar_direita_esquerda(raiz);
+
+    // if (avl_altura_no(raiz->fesq) - avl_altura_no(raiz->fdir) == 2)
+    //     if (item_get_chave(no->item) < item_get_chave(raiz->fesq->item))
+    //         raiz = rodar_direita(raiz);
+    //     else
+    //         raiz = rodar_esquerda_direita(raiz);
+
+    return true;
+}
+
 // Função auxiliar para imprimir uma subárvore AVL
-void avl_imprimir_subarvore(NODE *raiz)
+void avl_imprimir_subarvore(NO *raiz)
 {
     if (raiz != NULL)
     {
-        avl_imprimir_subarvore(raiz->esquerda);
+        avl_imprimir_subarvore(raiz->fesq);
         printf("%d ", item_get_chave(raiz->item));
-        avl_imprimir_subarvore(raiz->direita);
+        avl_imprimir_subarvore(raiz->fdir);
     }
 }
 
