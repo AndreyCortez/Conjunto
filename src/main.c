@@ -133,10 +133,19 @@ int main()
         remover(minha_avl, rand());
     }
 
-    for (int i = 0; i < tam_teste; i++)
+    for (int i = 0; i < tam_teste/2; i++)
     {
         remover(minha_avl, lista_teste[i]);
     }
+
+    avl_imprimir(minha_avl);
+
+    for (int i = tam_teste/2; i < tam_teste; i++)
+    {
+        remover(minha_avl, lista_teste[i]);
+    }
+
+    avl_imprimir(minha_avl);
 
     // Destruir a árvore AVL
     avl_apagar(&minha_avl);
