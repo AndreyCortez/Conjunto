@@ -38,7 +38,6 @@ void remover(AVL *t, int n)
 
 int main()
 {
-    // srand(time(NULL));
 
     // Criar uma árvore AVL
     AVL *minha_avl = avl_criar();
@@ -87,9 +86,9 @@ int main()
 
     printf("================================\n");
 
-
     printf("Teste de força bruta, inserção de 1000 itens aleatórios\n");
 
+    srand(time(NULL));
     const int tam_teste = 100;
     int lista_teste[tam_teste];
 
@@ -110,17 +109,34 @@ int main()
         inserir(minha_avl, lista_teste[i]);
     }
 
+    avl_imprimir(minha_avl);
+
+    printf("================================\n");
+
     for (int i = 0; i < tam_teste; i++)
     {
         buscar(minha_avl, lista_teste[i]);
+    }
+
+    // Buscar itens aleatórios na AVL pra ver como ela se comporta
+    for (int i = 0; i < tam_teste; i++)
+    {
+        buscar(minha_avl, rand());
+    }
+
+    printf("================================\n");
+
+    // Remover itens aleatórios na AVL pra ver como ela se comporta 
+
+    for (int i = 0; i < tam_teste; i++)
+    {
+        remover(minha_avl, rand());
     }
 
     for (int i = 0; i < tam_teste; i++)
     {
         remover(minha_avl, lista_teste[i]);
     }
-
-    avl_imprimir(minha_avl);
 
     // Destruir a árvore AVL
     avl_apagar(&minha_avl);
