@@ -110,6 +110,16 @@ int main()
         inserir(minha_avl, lista_teste[i]);
     }
 
+    for (int i = 0; i < tam_teste; i++)
+    {
+        buscar(minha_avl, lista_teste[i]);
+    }
+
+    for (int i = 0; i < tam_teste; i++)
+    {
+        remover(minha_avl, lista_teste[i]);
+    }
+
     avl_imprimir(minha_avl);
 
     // Destruir a árvore AVL
