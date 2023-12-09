@@ -69,6 +69,7 @@ NO *avl_cria_no(ITEM *item)
     }
     return no;
 }
+
 NO *rodar_direita(NO *a)
 {
     NO *b = a->fesq;
@@ -127,6 +128,8 @@ NO *avl_inserir_no(NO *raiz, NO *no)
         else
             raiz = rodar_esquerda_direita(raiz);
     }
+
+    // printf("oi\n");
     return raiz;
 }
 
@@ -134,14 +137,21 @@ bool avl_inserir(AVL *T, int chave)
 {
     NO *novo;
     ITEM *item = item_criar(chave);
-    if (T == NULL)
+
+    if (T == NULL || item == NULL)
         return (false);
+
     novo = avl_cria_no(item);
+
     if (novo != NULL)
     {
         T->raiz = avl_inserir_no(T->raiz, novo);
-        return (true);
+        if (T->raiz != NULL)
+            return (true);
+        else 
+            return false;
     }
+
     return (false);
 }
 
@@ -164,32 +174,99 @@ NO *avl_buscar_aux(NO *n, int chave)
 ITEM *avl_buscar(AVL *T, int chave)
 {
     if (T != NULL)
-        return avl_buscar_aux(T->raiz, chave)->item;
+    {
+        NO *res = avl_buscar_aux(T->raiz, chave);
+        if (res != NULL)
+            return res->item;
+    }
     return NULL;
 }
 
 void avl_troca_max_esq(NO *troca, NO *raiz, NO *ant)
 {
-    if (troca->fdir != NULL)
+    if ((troca)->fdir != NULL)
     {
-        avl_troca_max_esq(troca->fdir, raiz, troca);
+        avl_troca_max_esq((troca)->fdir, raiz, troca);
         return;
     }
 
     // Caso onde na primeira iteração da troca já
     // não tem filho direto
-    if (raiz == ant)
+    if ((raiz) == (ant))
     {
-        ant->fesq = troca->fesq;
+        (ant)->fesq = (troca)->fesq;
     }
     else
     {
-        ant->fdir = troca->fesq;
+        (ant)->fdir = (troca)->fesq;
     }
 
-    raiz->item = troca->item;
+    (raiz)->item = (troca)->item;
     free(troca);
     troca = NULL;
+}
+
+NO *avl_remover_aux(NO **raiz, int chave)
+{
+
+    if (*raiz == NULL)
+        return NULL;
+
+    if (chave == item_get_chave((*raiz)->item))
+    {
+        if ((*raiz)->fdir == NULL || (*raiz)->fesq == NULL)
+        {
+            NO *p = (*raiz);
+            if ((*raiz)->fdir != NULL)
+            {
+                (*raiz) = (*raiz)->fdir;
+            }
+            else
+            {
+                (*raiz) = (*raiz)->fesq;
+            }
+
+            // FIXME: tem um vazamento de memória bem aqui
+            // no_apagar(p);
+        }
+        // CASO 3: Nó tem dois filhos
+        else
+        {
+            avl_troca_max_esq((*raiz)->fesq, (*raiz), (*raiz));
+        }
+    }
+    else if (chave < item_get_chave((*raiz)->item))
+    {
+        (*raiz)->fesq = avl_remover_aux(&(*raiz)->fesq, chave);
+    }
+    else if (chave > item_get_chave((*raiz)->item))
+    {
+        (*raiz)->fdir = avl_remover_aux(&(*raiz)->fdir, chave);
+    }
+
+    if (*raiz != NULL)
+    {
+        // Código pra balancear a árvore (Só copiei do slide 0 chance de funcionar)
+        (*raiz)->altura = max(avl_altura_no((*raiz)->fesq), avl_altura_no((*raiz)->fdir)) + 1;
+
+        if (avl_altura_no((*raiz)->fesq) - avl_altura_no((*raiz)->fdir) == -2)
+        {
+            if (avl_altura_no((*raiz)->fdir->fesq) <= avl_altura_no((*raiz)->fdir->fdir))
+                (*raiz) = rodar_esquerda((*raiz));
+            else
+                (*raiz) = rodar_direita_esquerda((*raiz));
+        }
+
+        if (avl_altura_no((*raiz)->fesq) - avl_altura_no((*raiz)->fdir) == 2)
+        {
+            if (avl_altura_no((*raiz)->fesq->fesq) >= avl_altura_no((*raiz)->fesq->fdir))
+                (*raiz) = rodar_direita((*raiz));
+            else
+                (*raiz) = rodar_esquerda_direita((*raiz));
+        }
+    }
+
+    return *raiz;
 }
 
 bool avl_remover(AVL *T, int chave)
@@ -199,51 +276,10 @@ bool avl_remover(AVL *T, int chave)
     if (T->raiz == NULL)
         return false;
 
-    NO *raiz = T->raiz;
-
-    NO *apg = avl_buscar_aux(raiz, chave);
-
-    if (apg == NULL)
-    {
-        return false;
-    }
+    avl_remover_aux(&T->raiz, chave);
+    // NO *(*raiz) = T->raiz;
 
     // CASO 1 e 2: Nó possui um ou nenhum filho
-    if (apg->fdir == NULL || apg->fesq == NULL)
-    {
-
-        NO *p = apg;
-        if (apg->fdir != NULL)
-        {
-            apg = apg->fdir;
-        }
-        else
-        {
-            apg = apg->fesq;
-        }
-        // FIXME: tem um vazamento de memória bem aqui
-        // no_apagar(apg);
-    }
-    // CASO 3: Nó tem dois filhos
-    else
-    {
-        avl_troca_max_esq(apg->fesq, apg, apg);
-    }
-
-    // Código pra balancear a árvore (Só copiei do slide 0 chance de funcionar)
-    // raiz->altura = max(avl_altura_no(raiz->fesq), avl_altura_no(raiz->fdir)) + 1;
-
-    // if (avl_altura_no(raiz->fesq) - avl_altura_no(raiz->fdir) == -2)
-    //     if (item_get_chave(no->item) > item_get_chave(raiz->fdir->item))
-    //         raiz = rodar_esquerda(raiz);
-    //     else
-    //         raiz = rodar_direita_esquerda(raiz);
-
-    // if (avl_altura_no(raiz->fesq) - avl_altura_no(raiz->fdir) == 2)
-    //     if (item_get_chave(no->item) < item_get_chave(raiz->fesq->item))
-    //         raiz = rodar_direita(raiz);
-    //     else
-    //         raiz = rodar_esquerda_direita(raiz);
 
     return true;
 }
@@ -271,4 +307,6 @@ void avl_imprimir(AVL *tree)
     {
         printf("AVL vazia.\n");
     }
+
+    printf("Altura da AVL: %d\n", avl_altura_no(tree->raiz));
 }

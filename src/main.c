@@ -3,6 +3,7 @@
 #include "item.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 // Funções para alternar entre o teste da AVL e o teste do set
 // NÂO DEIXE OS DOIS DEFINIDOS AO MSM TEMPO, O PROGRAMA NÂO VAI COMPILAR!!!!!
@@ -11,43 +12,104 @@
 
 #ifdef TEST_AVL
 
+void inserir(AVL *t, int n)
+{
+    if (!avl_inserir(t, n))
+        printf("Falha ao inserir %d na AVL\n", n);
+    else
+        printf("%d inserido na AVL\n", n);
+}
+
+void buscar(AVL *t, int n)
+{
+    if (avl_buscar(t, n) == NULL)
+        printf("%d não encontrado na AVL\n", n);
+    else
+        printf("%d presente na AVL\n", n);
+}
+
+void remover(AVL *t, int n)
+{
+    if (!avl_remover(t, n))
+        printf("%d não presente na AVL\n", n);
+    else
+        printf("%d removido da AVL\n", n);
+}
+
 int main()
 {
+    // srand(time(NULL));
+
     // Criar uma árvore AVL
     AVL *minha_avl = avl_criar();
 
     // Inserir elementos na árvore
-    avl_inserir(minha_avl, 5);
-    avl_inserir(minha_avl, 3);
-    avl_inserir(minha_avl, 8);
-    avl_inserir(minha_avl, 2);
-    avl_inserir(minha_avl, 4);
-    avl_inserir(minha_avl, 7);
-    avl_inserir(minha_avl, 9);
+    inserir(minha_avl, 5);
+    inserir(minha_avl, 3);
+    inserir(minha_avl, 8);
+    inserir(minha_avl, 2);
+    inserir(minha_avl, 4);
+    inserir(minha_avl, 7);
+    inserir(minha_avl, 9);
 
     // Imprimir árvore AVL
     printf("Árvore AVL:\n");
     avl_imprimir(minha_avl);
 
-    // Buscar um elemento na árvore AVL
-    int chave_para_buscar = 4;
-    ITEM *resultado_busca = avl_buscar(minha_avl, chave_para_buscar);
+    printf("================================\n");
 
-    if (resultado_busca != NULL)
-    {
-        printf("Elemento %d encontrado na árvore AVL.\n", chave_para_buscar);
-    }
-    else
-    {
-        printf("Elemento %d não encontrado na árvore AVL.\n", chave_para_buscar);
-    }
+    // Buscar um elemento na árvore AVL
+    buscar(minha_avl, 6);
+    buscar(minha_avl, 3);
+    buscar(minha_avl, 8);
+    buscar(minha_avl, 2);
+    buscar(minha_avl, 4);
+    buscar(minha_avl, 7);
+    buscar(minha_avl, 9);
+
+    printf("================================\n");
 
     // Remover um elemento da árvore AVL
-    int chave_para_remover = 3;
-    avl_remover(minha_avl, chave_para_remover);
+    remover(minha_avl, 5);
+    remover(minha_avl, 3);
+    remover(minha_avl, 8);
+    remover(minha_avl, 2);
+
+    avl_imprimir(minha_avl);
+
+    remover(minha_avl, 4);
+    remover(minha_avl, 7);
+    remover(minha_avl, 9);
 
     // Imprimir árvore AVL após a remoção
-    printf("\nÁrvore AVL após a remoção do elemento %d:\n", chave_para_remover);
+    // printf("\nÁrvore AVL após a remoção do elemento %d:\n", chave_para_remover);
+    avl_imprimir(minha_avl);
+
+    printf("================================\n");
+
+
+    printf("Teste de força bruta, inserção de 1000 itens aleatórios\n");
+
+    const int tam_teste = 100;
+    int lista_teste[tam_teste];
+
+    for (int i = 0; i < tam_teste; i++)
+    {
+        lista_teste[i] = rand();
+        // printf("%d\n", lista_teste[i]);
+
+        // Teste com inserções em ordem crescente
+        // lista_teste[i] = i;
+
+        // Teste com inserções em ordem decrescente
+        // lista_teste[i] = tam_teste - i;
+    }
+
+    for (int i = 0; i < tam_teste; i++)
+    {
+        inserir(minha_avl, lista_teste[i]);
+    }
+
     avl_imprimir(minha_avl);
 
     // Destruir a árvore AVL
