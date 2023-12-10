@@ -77,7 +77,7 @@ NO *rodar_direita(NO *a)
     b->fdir = a;
 
     a->altura = max(avl_altura_no(a->fesq), avl_altura_no(a->fdir)) + 1;
-    // b->altura = max(avl_altura_no(b->fesq), a->altura )+ 1;
+    b->altura = max(avl_altura_no(b->fesq), a->altura )+ 1;
     return b;
 }
 
@@ -87,7 +87,7 @@ NO *rodar_esquerda(NO *a)
     a->fdir = b->fesq;
     b->fesq = a;
     a->altura = max(avl_altura_no(a->fesq), avl_altura_no(a->fdir)) + 1;
-    // b->altura = max(avl_altura_no(b->fdir), a->altura) + 1;
+    b->altura = max(avl_altura_no(b->fdir), a->altura) + 1;
     return b;
 }
 
@@ -216,7 +216,7 @@ NO *avl_remover_aux(NO **raiz, int chave)
     {
         if ((*raiz)->fdir == NULL || (*raiz)->fesq == NULL)
         {
-            NO *p = (*raiz);
+            //NO *p = (*raiz);
             if ((*raiz)->fdir != NULL)
             {
                 (*raiz) = (*raiz)->fdir;
@@ -296,11 +296,11 @@ void avl_imprimir_subarvore(NO *raiz)
 }
 
 // Função pública para imprimir a árvore AVL
-void avl_imprimir(AVL *tree)
+void avl_imprimir(AVL *T)
 {
-    if (tree != NULL)
+    if (T != NULL)
     {
-        avl_imprimir_subarvore(tree->raiz);
+        avl_imprimir_subarvore(T->raiz);
         printf("\n");
     }
     else
@@ -308,5 +308,54 @@ void avl_imprimir(AVL *tree)
         printf("AVL vazia.\n");
     }
 
-    printf("Altura da AVL: %d\n", avl_altura_no(tree->raiz));
+    printf("Altura da AVL: %d\n", avl_altura_no(T->raiz));
 }
+
+// Função auxiliar para unir duas árvores AVL
+void avl_uniao_aux(AVL *C, NO *raiz)
+{
+    if (raiz == NULL)
+        return;
+    avl_inserir(C, item_get_chave(raiz->item));
+    avl_uniao_aux(C, raiz->fesq);
+    avl_uniao_aux(C, raiz->fdir);
+}
+
+AVL *avl_uniao(AVL *A, AVL *B)
+{
+    AVL *C = (AVL *)malloc(sizeof(AVL));
+    avl_uniao_aux(C, A->raiz);
+    avl_uniao_aux(C, B->raiz);
+    return C;
+}
+
+// Função auxiliar para encontrar a interseção de duas árvores AVL
+NO *avl_intersecao_arvores(NO *raiz1, NO *raiz2)
+{
+    if (raiz1 == NULL || raiz2 == NULL)
+        return NULL;
+
+
+    if (item_get_chave(raiz1->item) < item_get_chave(raiz2->item))
+        return avl_intersecao_arvores(raiz1->fdir, raiz2);
+
+    if (item_get_chave(raiz1->item) > item_get_chave(raiz2->item))
+        return avl_intersecao_arvores(raiz1, raiz2->fdir);
+
+  
+    AVL *nova_arvore = avl_criar();
+    nova_arvore->raiz = avl_cria_no(raiz1->item);
+
+    nova_arvore->raiz->fesq = avl_intersecao_arvores(raiz1->fesq, raiz2->fesq);
+    nova_arvore->raiz->fdir = avl_intersecao_arvores(raiz1->fdir, raiz2->fdir);
+
+    return nova_arvore->raiz;
+}
+
+AVL *avl_interseccao(AVL *T1, AVL *T2)
+{
+    AVL *resultado = avl_criar();
+    resultado->raiz = avl_intersecao_arvores(T1->raiz, T2->raiz);
+    return resultado;
+}
+

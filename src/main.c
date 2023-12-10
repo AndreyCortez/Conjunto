@@ -7,7 +7,7 @@
 
 // Funções para alternar entre o teste da AVL e o teste do set
 // NÂO DEIXE OS DOIS DEFINIDOS AO MSM TEMPO, O PROGRAMA NÂO VAI COMPILAR!!!!!
-#define TEST_AVL
+/*#define TEST_AVL
 // #define TEST_SET
 
 #ifdef TEST_AVL
@@ -222,4 +222,39 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-#endif
+#endif*/
+
+int main(){
+    SET *conjuntoA = set_criar();
+set_inserir(conjuntoA, 10);
+set_inserir(conjuntoA, 5);
+set_inserir(conjuntoA, 22);
+set_inserir(conjuntoA, 3);
+set_inserir(conjuntoA, 12);
+set_inserir(conjuntoA, 1);
+
+SET *conjuntoB = set_criar();
+set_inserir(conjuntoB, 10);
+set_inserir(conjuntoB, 15);
+set_inserir(conjuntoB, 12);
+set_inserir(conjuntoB, 1);
+set_inserir(conjuntoB, 3);
+set_inserir(conjuntoB, 122);
+
+SET *intersecao = set_interseccao(conjuntoA, conjuntoB);
+
+printf("Conjunto A:\n");
+set_imprimir(conjuntoA);
+
+printf("Conjunto B:\n");
+set_imprimir(conjuntoB);
+
+printf("Interseção de A e B:\n");
+set_imprimir(intersecao);
+
+set_apagar(&conjuntoA);
+set_apagar(&conjuntoB);
+set_apagar(&intersecao);
+
+
+}
