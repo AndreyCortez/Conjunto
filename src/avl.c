@@ -75,8 +75,12 @@ NO *avl_cria_no(ITEM *item)
 // Função para apagar um nó
 bool avl_apaga_no(NO **no)
 {
+    if (*no == NULL)
+        return false;
+        
     item_apagar(&(*no)->item);
     free(*no);
+    return true;
 }
 
 // função de rotação dir
@@ -218,9 +222,11 @@ void avl_troca_max_esq(NO *troca, NO *raiz, NO *ant)
     }
 
     // Substitui o valor do nó raiz pelo valor do nó troca
+    ITEM *temp = (raiz)->item;
     (raiz)->item = (troca)->item;
 
     // Libera a memória alocada para o nó troca
+    item_apagar(&temp);
     free(troca);
 
     // Define o ponteiro do nó troca como NULL para evitar acesso acidental
@@ -236,10 +242,10 @@ NO *avl_remover_aux(NO **raiz, int chave)
     // Verifica se a chave a ser removida é igual à chave do nó atual
     if (chave == item_get_chave((*raiz)->item))
     {
-        NO *p = raiz;
         // CASO 1 e 2: Nó possui um ou nenhum filho
         if ((*raiz)->fdir == NULL || (*raiz)->fesq == NULL)
         {
+            NO *p = *raiz;
             if ((*raiz)->fdir != NULL)
             {
                 // Se o nó tem um filho à direita, substitui o nó pelo filho à direita
@@ -251,7 +257,8 @@ NO *avl_remover_aux(NO **raiz, int chave)
                 (*raiz) = (*raiz)->fesq;
             }
 
-            avl_apaga_no(p);
+            // Desalocar o nó não utilizado
+            avl_apaga_no(&p);
         }
         // CASO 3: Nó tem dois filhos
         else
@@ -330,7 +337,7 @@ void avl_imprimir(AVL *T)
 {
     if (T == NULL)
         return;
-    avl_imprimir_aux(T->raiz);
+    avl_imprimir_subarvore(T->raiz);
 }
 
 // Função auxiliar para unir duas árvores AVL
