@@ -1,0 +1,27 @@
+### Justificativa da Escolha da Árvore AVL:
+
+1. Busca Eficiente: A árvore AVL é uma árvore de busca binária balanceada, o que significa que a altura da árvore é mantida de forma balanceada após cada operação de inserção ou remoção. Isso garante uma busca eficiente com uma complexidade de O(log n), onde n é o número de elementos no conjunto.
+
+2. Inserção e Remoção Eficientes: As operações de inserção e remoção em árvores AVL também têm uma complexidade de O(log n), pois a árvore é reequilibrada após cada operação, mantendo a propriedade de altura balanceada.
+
+3. Conjuntos Ordenados: Como uma árvore AVL é uma árvore de busca binária, os elementos podem ser acessados em ordem. Isso pode ser uma vantagem em situações onde você precisa iterar sobre os elementos em ordem.
+
+### Complexidade Computacional de Tempo (Big O):
+
+1. Busca (`set_pertence`): O(log n) - Devido à propriedade de árvore de busca binária balanceada.
+
+2. Inserção (`set_inserir`): O(log n) - Inserção em uma árvore AVL requer operações de rotação para manter a árvore balanceada.
+
+3. Remoção (`set_remover`): O(log n) - Remoção em uma árvore AVL também requer operações de rotação para manter a árvore balanceada.
+
+4. União (`set_uniao`): O(m log n), onde m é o número de elementos no conjunto resultante. A operação envolve a inserção de elementos de ambos os conjuntos na árvore AVL resultante.
+
+5. Interseção (`set_interseccao`): O(m log n) - Similar à união, a interseção envolve a inserção de elementos em uma nova árvore AVL.
+
+### Observações Adicionais:
+
+- **Espaço:** A implementação com árvore AVL consome um pouco mais de espaço devido às informações adicionais necessárias para manter o balanceamento.
+
+- Impressão (`set_imprimir`): A complexidade de impressão é O(n) pois a impressão envolve a visita de todos os elementos na ordem desejada.
+
+Em resumo, a escolha de uma árvore AVL oferece um equilíbrio entre eficiência nas operações básicas de conjunto, ao custo de um ligeiro aumento no uso de espaço.
