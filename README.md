@@ -31,7 +31,7 @@ make all
 Para executar os arquivos, basta executar o comando `make run` no terminal.
 
 ```bash
-make all
+make run
 ```
 
 ### Limpeza
