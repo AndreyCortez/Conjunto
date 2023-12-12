@@ -16,9 +16,10 @@ struct avl
     int profundidade;
 };
 
+//função de criar uma avl
 AVL *avl_criar(void)
 {
-    AVL *arvore = (AVL *)malloc(sizeof(AVL));
+    AVL *arvore = (AVL *)malloc(sizeof(AVL));//aloca espaço e verifica se foi bem alocado
     if (arvore != NULL)
     {
         arvore->raiz = NULL;
@@ -26,7 +27,7 @@ AVL *avl_criar(void)
     }
     return arvore;
 }
-
+//função de apagar avl auxiliar
 void avl_apagar_aux(NO *raiz)
 {
     if (raiz != NULL)
@@ -37,7 +38,7 @@ void avl_apagar_aux(NO *raiz)
         free(raiz);
     }
 }
-
+//função de apagar avl principal
 void avl_apagar(AVL **arvore)
 {
     avl_apagar_aux((*arvore)->raiz);
@@ -45,6 +46,7 @@ void avl_apagar(AVL **arvore)
     *arvore = NULL;
 }
 
+//função auxiliar que verifica a altura da arvore para saber se esta balanceada
 int avl_altura_no(NO *raiz)
 {
     if (raiz == NULL)
@@ -56,7 +58,7 @@ int avl_altura_no(NO *raiz)
         return raiz->altura;
     }
 }
-
+//função que cria os nó usados na arvore
 NO *avl_cria_no(ITEM *item)
 {
     NO *no = (NO *)malloc(sizeof(NO));
@@ -69,18 +71,18 @@ NO *avl_cria_no(ITEM *item)
     }
     return no;
 }
-
+//função de rotação dir
 NO *rodar_direita(NO *a)
 {
-    NO *b = a->fesq;
-    a->fesq = b->fdir;
-    b->fdir = a;
+    NO *b = a->fesq;//cria um aux que recebe o esquerdo do no problema
+    a->fesq = b->fdir;//esse esq recebe o direito que no caso é o direito do no problema
+    b->fdir = a;//para completa a rotação o direito recebe de fato a raiz a 
 
-    a->altura = max(avl_altura_no(a->fesq), avl_altura_no(a->fdir)) + 1;
-    b->altura = max(avl_altura_no(b->fesq), a->altura )+ 1;
+    a->altura = max(avl_altura_no(a->fesq), avl_altura_no(a->fdir)) + 1;//atualiza a altura do no problema
+    b->altura = max(avl_altura_no(b->fesq), a->altura )+ 1;//atualiza a altura do novo no b
     return b;
 }
-
+//função de rotação esq segue os mesmos parametros do da direita porem tudo a esquerda
 NO *rodar_esquerda(NO *a)
 {
     NO *b = a->fdir;
@@ -90,30 +92,31 @@ NO *rodar_esquerda(NO *a)
     b->altura = max(avl_altura_no(b->fdir), a->altura) + 1;
     return b;
 }
-
+//função de rotação esq/dir chama as funções na ordem necessária
 NO *rodar_esquerda_direita(NO *a)
 {
     a->fesq = rodar_esquerda(a->fesq);
     return rodar_direita(a);
 }
-
+//função de rotação dir/esq chama as funções na ordem necessária
 NO *rodar_direita_esquerda(NO *a)
 {
     a->fdir = rodar_direita(a->fdir);
     return rodar_esquerda(a);
 }
-
+//função aux para inserir um no em uma arvore
 NO *avl_inserir_no(NO *raiz, NO *no)
 {
-    if (raiz == NULL)
+    if (raiz == NULL)//caso de parada da recursao
         raiz = no;
-    else if (item_get_chave(no->item) < item_get_chave(raiz->item))
+    else if (item_get_chave(no->item) < item_get_chave(raiz->item))//como é uma arvore binaria deve comparar as chaves 
         raiz->fesq = avl_inserir_no(raiz->fesq, no);
     else if (item_get_chave(no->item) > item_get_chave(raiz->item))
         raiz->fdir = avl_inserir_no(raiz->fdir, no);
 
-    raiz->altura = max(avl_altura_no(raiz->fesq), avl_altura_no(raiz->fdir)) + 1;
+    raiz->altura = max(avl_altura_no(raiz->fesq), avl_altura_no(raiz->fdir)) + 1;//atualiza a altura apos a inserção
 
+    //rebalanceamento da arvore atravez das rotações
     if (avl_altura_no(raiz->fesq) - avl_altura_no(raiz->fdir) == -2)
     {
         if (item_get_chave(no->item) > item_get_chave(raiz->fdir->item))
@@ -129,10 +132,10 @@ NO *avl_inserir_no(NO *raiz, NO *no)
             raiz = rodar_esquerda_direita(raiz);
     }
 
-    // printf("oi\n");
+   
     return raiz;
 }
-
+//função principal de inserção
 bool avl_inserir(AVL *T, int chave)
 {
     NO *novo;
@@ -155,6 +158,7 @@ bool avl_inserir(AVL *T, int chave)
     return (false);
 }
 
+//função de busca aux 
 NO *avl_buscar_aux(NO *n, int chave)
 {
     if (n == NULL)
@@ -165,12 +169,12 @@ NO *avl_buscar_aux(NO *n, int chave)
     if (chave_item == chave)
         return n;
 
-    if (chave < chave_item)
+    if (chave < chave_item)//compara as chaves
         return avl_buscar_aux(n->fesq, chave);
     else
         return avl_buscar_aux(n->fdir, chave);
 }
-
+/*Função busca o item dentro da arvore*/
 ITEM *avl_buscar(AVL *T, int chave)
 {
     if (T != NULL)
@@ -182,73 +186,92 @@ ITEM *avl_buscar(AVL *T, int chave)
     return NULL;
 }
 
+//função aux para ajudar na remoção, poderia ser troca min direito
+// Função para trocar um nó pelo nó com o valor máximo à esquerda
 void avl_troca_max_esq(NO *troca, NO *raiz, NO *ant)
 {
+    // Verifica se o nó troca tem um filho à direita
     if ((troca)->fdir != NULL)
     {
+        // Chama recursivamente a função para encontrar o valor máximo à esquerda
         avl_troca_max_esq((troca)->fdir, raiz, troca);
         return;
     }
 
-    // Caso onde na primeira iteração da troca já
-    // não tem filho direto
+    // Caso inicial da troca
     if ((raiz) == (ant))
     {
+        // Atualiza o ponteiro do pai para apontar para o filho à esquerda do nó troca
         (ant)->fesq = (troca)->fesq;
     }
     else
     {
+        // Atualiza o ponteiro do pai para apontar para o filho à esquerda do nó troca
         (ant)->fdir = (troca)->fesq;
     }
 
+    // Substitui o valor do nó raiz pelo valor do nó troca
     (raiz)->item = (troca)->item;
+
+    // Libera a memória alocada para o nó troca
     free(troca);
+
+    // Define o ponteiro do nó troca como NULL para evitar acesso acidental
     troca = NULL;
 }
 
+
 NO *avl_remover_aux(NO **raiz, int chave)
 {
-
+    // Se a raiz for nula, não há nada a ser removido
     if (*raiz == NULL)
         return NULL;
 
+    // Verifica se a chave a ser removida é igual à chave do nó atual
     if (chave == item_get_chave((*raiz)->item))
     {
+        // CASO 1 e 2: Nó possui um ou nenhum filho
         if ((*raiz)->fdir == NULL || (*raiz)->fesq == NULL)
         {
-            //NO *p = (*raiz);
             if ((*raiz)->fdir != NULL)
             {
+                // Se o nó tem um filho à direita, substitui o nó pelo filho à direita
                 (*raiz) = (*raiz)->fdir;
             }
             else
             {
+                // Se o nó tem um filho à esquerda ou nenhum filho, substitui o nó pelo filho à esquerda (que pode ser NULL)
                 (*raiz) = (*raiz)->fesq;
             }
 
-            // FIXME: tem um vazamento de memória bem aqui
+            // FIXME: há um vazamento de memória aqui, é necessário apagar o nó removido
             // no_apagar(p);
         }
         // CASO 3: Nó tem dois filhos
         else
         {
+            // Troca o nó atual pelo nó que contém o valor máximo à esquerda
             avl_troca_max_esq((*raiz)->fesq, (*raiz), (*raiz));
         }
     }
     else if (chave < item_get_chave((*raiz)->item))
     {
+        // Se a chave a ser removida é menor, busca e remove na subárvore esquerda
         (*raiz)->fesq = avl_remover_aux(&(*raiz)->fesq, chave);
     }
     else if (chave > item_get_chave((*raiz)->item))
     {
+        // Se a chave a ser removida é maior, busca e remove na subárvore direita
         (*raiz)->fdir = avl_remover_aux(&(*raiz)->fdir, chave);
     }
 
+    // Após a remoção, é necessário balancear a árvore
     if (*raiz != NULL)
     {
-        // Código pra balancear a árvore (Só copiei do slide 0 chance de funcionar)
+        // Atualiza a altura do nó atual
         (*raiz)->altura = max(avl_altura_no((*raiz)->fesq), avl_altura_no((*raiz)->fdir)) + 1;
 
+        // Verifica e realiza rotações para manter o balanceamento
         if (avl_altura_no((*raiz)->fesq) - avl_altura_no((*raiz)->fdir) == -2)
         {
             if (avl_altura_no((*raiz)->fdir->fesq) <= avl_altura_no((*raiz)->fdir->fdir))
@@ -266,21 +289,22 @@ NO *avl_remover_aux(NO **raiz, int chave)
         }
     }
 
+    // Retorna a raiz atualizada
     return *raiz;
 }
 
 bool avl_remover(AVL *T, int chave)
 {
+    // Verifica se a árvore e a raiz são válidas
     if (T == NULL)
         return false;
     if (T->raiz == NULL)
         return false;
 
+    // Chama a função auxiliar para realizar a remoção
     avl_remover_aux(&T->raiz, chave);
-    // NO *(*raiz) = T->raiz;
 
-    // CASO 1 e 2: Nó possui um ou nenhum filho
-
+    // Retorna verdadeiro indicando que a remoção foi bem-sucedida
     return true;
 }
 
@@ -298,64 +322,46 @@ void avl_imprimir_subarvore(NO *raiz)
 // Função pública para imprimir a árvore AVL
 void avl_imprimir(AVL *T)
 {
-    if (T != NULL)
-    {
-        avl_imprimir_subarvore(T->raiz);
-        printf("\n");
-    }
-    else
-    {
-        printf("AVL vazia.\n");
-    }
-
-    printf("Altura da AVL: %d\n", avl_altura_no(T->raiz));
+    if (T == NULL)
+        return;
+    avl_imprimir_aux(T->raiz);
 }
 
 // Função auxiliar para unir duas árvores AVL
 void avl_uniao_aux(AVL *C, NO *raiz)
 {
-    if (raiz == NULL)
+    if (raiz == NULL)//verfica se a raiz é nula
         return;
-    avl_inserir(C, item_get_chave(raiz->item));
-    avl_uniao_aux(C, raiz->fesq);
-    avl_uniao_aux(C, raiz->fdir);
+    avl_inserir(C, item_get_chave(raiz->item));//insere na arvore as raizes
+    avl_uniao_aux(C, raiz->fesq);//volta com recursão pela esquerda
+    avl_uniao_aux(C, raiz->fdir);//volta com recursão pela direita
 }
 
 AVL *avl_uniao(AVL *A, AVL *B)
 {
-    AVL *C = (AVL *)malloc(sizeof(AVL));
-    avl_uniao_aux(C, A->raiz);
-    avl_uniao_aux(C, B->raiz);
+    AVL *C = (AVL *)malloc(sizeof(AVL));//cria uma nova arvore que resultara da uniao de A e B
+    C = avl_criar();
+    avl_uniao_aux(C, A->raiz);//primeiro insere todos os elementos da arvore A
+    avl_uniao_aux(C, B->raiz);//apos isso insere todos os elementos da arvore B
     return C;
 }
 
-// Função auxiliar para encontrar a interseção de duas árvores AVL
-NO *avl_intersecao_arvores(NO *raiz1, NO *raiz2)
+void avl_interseccao_aux(AVL *T3, NO *raiz1, AVL *T2)
 {
-    if (raiz1 == NULL || raiz2 == NULL)
-        return NULL;
-
-
-    if (item_get_chave(raiz1->item) < item_get_chave(raiz2->item))
-        return avl_intersecao_arvores(raiz1->fdir, raiz2);
-
-    if (item_get_chave(raiz1->item) > item_get_chave(raiz2->item))
-        return avl_intersecao_arvores(raiz1, raiz2->fdir);
-
-  
-    AVL *nova_arvore = avl_criar();
-    nova_arvore->raiz = avl_cria_no(raiz1->item);
-
-    nova_arvore->raiz->fesq = avl_intersecao_arvores(raiz1->fesq, raiz2->fesq);
-    nova_arvore->raiz->fdir = avl_intersecao_arvores(raiz1->fdir, raiz2->fdir);
-
-    return nova_arvore->raiz;
+    if (raiz1 == NULL)//verifica se a raiz é nula
+        return;
+    
+    if (avl_buscar(T2, item_get_chave(raiz1->item)) != NULL)//busca na arvore 2 elementos em comum com a arvore 1 que esta sendo pecorrida atraves da sua raiz
+        avl_inserir(T3, item_get_chave(raiz1->item));//quando encontra esse elemento ela insere ele na nova arvore de intersecção
+    
+    avl_interseccao_aux(T3, raiz1->fesq, T2);//navega pela arvore 1
+    avl_interseccao_aux(T3, raiz1->fdir, T2);
 }
 
 AVL *avl_interseccao(AVL *T1, AVL *T2)
 {
-    AVL *resultado = avl_criar();
-    resultado->raiz = avl_intersecao_arvores(T1->raiz, T2->raiz);
-    return resultado;
+    AVL *T3 = (AVL *)malloc(sizeof(AVL));//cria uma nova arvore que resultara da intersecção de 1 e 2
+    T3 = avl_criar();
+    avl_interseccao_aux(T3, T1->raiz, T2);
+    return T3;
 }
-

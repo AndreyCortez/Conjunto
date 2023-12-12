@@ -1,13 +1,41 @@
+/*
+Integrantes:
+Andrey Cortez Rufino 11819487 
+Isabela Beatriz Sousa Nunes Farias 13823833
+
+Descrição do Problema:
+Conjunto é um conceito básico do ramo matemático da Teoria dos Conjuntos. Um
+Conjunto representa uma coleção de objetos, em que cada objeto é denominado
+elemento. A relação básica entre um elemento e o conjunto é a relação de
+pertinência, que determina se um elemento pertence ou não ao conjunto.
+Conjuntos tem diversas aplicações em sistemas computacionais, estando
+presentes em várias linguagens de programação (como uma ED), assim como em
+soluções de problemas matemáticos (puros e aplicados), de otimização e estatísticos.
+
+Objetivo do Trabalho:
+Implementar o TAD Conjunto de modo que a Estrutura de Dados escolhida
+possibilite que as operações específicas tenham a menor complexidade
+computacional possível. As operações consideradas são:
+- 1) Operações básicas para TADs em geral: Criar (um conjunto), Apagar (um
+conjunto), Inserir (um elemento em um conjunto), Remover (um elemento de um
+conjunto) e Imprimir (imprimir os elementos/itens armazenados no TAD).
+- 2) Operações específicas de conjuntos: Pertence (um elemento está presente
+ou não no conjunto), União, Intersecção. Note que essas 2 útlimas operações
+recebem como entrada 2 conjuntos e devolvem um terceiro conjunto como resposta
+*/
+
+
 #include "set.h"
 #include "avl.h"
 #include "item.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#define NUM_ELEMENTOS_GRANDE 100000
 
 // Funções para alternar entre o teste da AVL e o teste do set
 // NÂO DEIXE OS DOIS DEFINIDOS AO MSM TEMPO, O PROGRAMA NÂO VAI COMPILAR!!!!!
-/*#define TEST_AVL
+#define TEST_AVL
 // #define TEST_SET
 
 #ifdef TEST_AVL
@@ -222,39 +250,4 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-#endif*/
-
-int main(){
-    SET *conjuntoA = set_criar();
-set_inserir(conjuntoA, 10);
-set_inserir(conjuntoA, 5);
-set_inserir(conjuntoA, 22);
-set_inserir(conjuntoA, 3);
-set_inserir(conjuntoA, 12);
-set_inserir(conjuntoA, 1);
-
-SET *conjuntoB = set_criar();
-set_inserir(conjuntoB, 10);
-set_inserir(conjuntoB, 15);
-set_inserir(conjuntoB, 12);
-set_inserir(conjuntoB, 1);
-set_inserir(conjuntoB, 3);
-set_inserir(conjuntoB, 122);
-
-SET *intersecao = set_interseccao(conjuntoA, conjuntoB);
-
-printf("Conjunto A:\n");
-set_imprimir(conjuntoA);
-
-printf("Conjunto B:\n");
-set_imprimir(conjuntoB);
-
-printf("Interseção de A e B:\n");
-set_imprimir(intersecao);
-
-set_apagar(&conjuntoA);
-set_apagar(&conjuntoB);
-set_apagar(&intersecao);
-
-
-}
+#endif
