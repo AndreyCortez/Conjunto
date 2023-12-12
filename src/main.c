@@ -35,8 +35,8 @@ recebem como entrada 2 conjuntos e devolvem um terceiro conjunto como resposta
 
 // Funções para alternar entre o teste da AVL e o teste do set
 // NÂO DEIXE OS DOIS DEFINIDOS AO MSM TEMPO, O PROGRAMA NÂO VAI COMPILAR!!!!!
-#define TEST_AVL
-// #define TEST_SET
+// #define TEST_AVL
+#define TEST_SET
 
 #ifdef TEST_AVL
 
@@ -185,7 +185,7 @@ int main()
 
 #ifdef TEST_SET
 
-int main(int argc, char *argv[])
+int main()
 {
     SET *A, *B;
     int n_a, n_b, x;
@@ -217,9 +217,9 @@ int main(int argc, char *argv[])
         int num;
         scanf("%d", &num);
         if (set_pertence(A, num))
-            printf("Pertence.");
+            printf("Pertence. ");
         else
-            printf("Não Pertence.");
+            printf("Não Pertence. ");
         break;
     }
     case 2:
@@ -247,6 +247,7 @@ int main(int argc, char *argv[])
 
     set_apagar(&A);
     set_apagar(&B);
+    printf("\n");
 
     return 0;
 }

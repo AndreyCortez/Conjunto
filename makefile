@@ -29,7 +29,10 @@ run: all
 	./$(EXECUTABLE)
 
 zip:
-	zip -r $(ZIP_FILE) $(SRC_DIR) $(INC_DIR) Makefile
+	zip -r $(ZIP_FILE) $(SRC_DIR) $(INC_DIR) makefile test_in test_out criar_casos_teste.py relatorio.txt README.md test.sh
 
 clean:
-	rm -rf $(BIN_DIR) $(OBJ_DIR) $(ZIP_FILE)
+	rm -rf $(BIN_DIR) $(OBJ_DIR)
+
+test:
+	bash ./test.sh 

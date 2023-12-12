@@ -27,21 +27,35 @@ AVL *avl_criar(void)
     }
     return arvore;
 }
-// função de apagar avl auxiliar
-void avl_apagar_aux(NO *raiz)
+
+// Função para apagar um nó
+bool avl_apaga_no(NO **no)
 {
-    if (raiz != NULL)
+    if (*no == NULL)
+        return false;
+
+    item_apagar(&(*no)->item);
+    free(*no);
+    return true;
+}
+
+// função de apagar avl auxiliar
+void avl_apagar_aux(NO **raiz)
+{
+    if (*raiz != NULL)
     {
-        avl_apagar_aux(raiz->fesq);
-        avl_apagar_aux(raiz->fdir);
-        item_apagar(&raiz->item);
-        free(raiz);
+        avl_apagar_aux(&(*raiz)->fesq);
+        avl_apagar_aux(&(*raiz)->fdir);
+        avl_apaga_no(raiz);
     }
 }
+
 // função de apagar avl principal
 void avl_apagar(AVL **arvore)
 {
-    avl_apagar_aux((*arvore)->raiz);
+    if (*arvore == NULL)
+        return;
+    avl_apagar_aux(&(*arvore)->raiz);
     free(*arvore);
     *arvore = NULL;
 }
@@ -70,17 +84,6 @@ NO *avl_cria_no(ITEM *item)
         no->item = item;
     }
     return no;
-}
-
-// Função para apagar um nó
-bool avl_apaga_no(NO **no)
-{
-    if (*no == NULL)
-        return false;
-        
-    item_apagar(&(*no)->item);
-    free(*no);
-    return true;
 }
 
 // função de rotação dir
@@ -352,8 +355,7 @@ void avl_uniao_aux(AVL *C, NO *raiz)
 
 AVL *avl_uniao(AVL *A, AVL *B)
 {
-    AVL *C = (AVL *)malloc(sizeof(AVL)); // cria uma nova arvore que resultara da uniao de A e B
-    C = avl_criar();
+    AVL *C = avl_criar();
     avl_uniao_aux(C, A->raiz); // primeiro insere todos os elementos da arvore A
     avl_uniao_aux(C, B->raiz); // apos isso insere todos os elementos da arvore B
     return C;
@@ -373,8 +375,7 @@ void avl_interseccao_aux(AVL *T3, NO *raiz1, AVL *T2)
 
 AVL *avl_interseccao(AVL *T1, AVL *T2)
 {
-    AVL *T3 = (AVL *)malloc(sizeof(AVL)); // cria uma nova arvore que resultara da intersecção de 1 e 2
-    T3 = avl_criar();
+    AVL *T3 = avl_criar(); // cria uma nova arvore que resultara da intersecção de 1 e 2
     avl_interseccao_aux(T3, T1->raiz, T2);
     return T3;
 }

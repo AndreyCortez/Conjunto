@@ -11,3 +11,7 @@ obj/
 # Ignore arquivos de configuração do sistema
 .DS_Store
 Thumbs.db
+
+# Ignore os arquivos de teste
+test_in/*
+test_out/*

@@ -15,6 +15,16 @@ SET *set_criar(void) {
     return novo_conjunto;
 }
 
+// Função para poder setar o conjunto de um set
+bool set_set_conjunto(SET* s, AVL* conjunto)
+{
+    if (s == NULL || conjunto == NULL)
+        return false;
+    avl_apagar(&s->conjunto);
+    s->conjunto = conjunto;
+    return true;
+}
+
 // Função para verificar se um elemento pertence ao conjunto
 bool set_pertence(SET *A, int elemento) {
     if (A == NULL)
@@ -59,7 +69,7 @@ SET *set_uniao(SET *A, SET *B) {
         return A;
 
     SET *uniao = set_criar();
-    uniao->conjunto = avl_uniao(A->conjunto, B->conjunto);
+    set_set_conjunto(uniao, avl_uniao(A->conjunto, B->conjunto));
 
     return uniao;
 }
@@ -70,7 +80,7 @@ SET *set_interseccao(SET *A, SET *B) {
         return NULL;
 
     SET *intersecao = set_criar();
-    intersecao->conjunto = avl_interseccao(A->conjunto, B->conjunto);
+    set_set_conjunto(intersecao, avl_interseccao(A->conjunto, B->conjunto));
 
     return intersecao;
 }

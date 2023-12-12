@@ -42,6 +42,20 @@ Para remover os arquivos de objeto e o executável gerados durante a compilaçã
 make clean
 ```
 
+### Testes
+
+Para criar os casos de teste use o script `criar_casos_teste.py`
+
+```bash
+python3 criar_casos_teste.py
+```
+
+Para executar os casos de teste, use o comando `make test`.
+
+```bash
+make test
+```
+
 ### Criação do Arquivo ZIP
 
 Para criar um arquivo `.zip` contendo todos os arquivos relevantes do projeto, execute o seguinte comando:
@@ -62,4 +76,10 @@ sudo apt-get install zip   # Para sistemas baseados em Debian/Ubuntu
 sudo yum install zip       # Para sistemas baseados em Red Hat/Fedora
 ```
 
-Isso completa a documentação básica para compilar e usar este projeto em C.
+Certifique-se de ter o `python` instalado no seu sistema para criar os casos de teste.
+
+```bash
+sudo apt-get install python   # Para sistemas baseados em Debian/Ubuntu
+# ou
+sudo yum install python       # Para sistemas baseados em Red Hat/Fedora
+```
