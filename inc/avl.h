@@ -14,7 +14,7 @@
 	bool avl_remover(AVL *T, int chave);
 	ITEM* avl_buscar(AVL* T, int chave);
 	void avl_imprimir(AVL* T);
-	AVL* avl_uniao(AVL *T1, AVL *T2);
+	AVL *avl_uniao(AVL *A, AVL *B);
 	AVL* avl_interseccao(AVL *T1, AVL *T2);
 
 #endif
