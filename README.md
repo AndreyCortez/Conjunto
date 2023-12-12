@@ -1,3 +1,4 @@
+
 # Projeto Conjunto em C
 
 Este é um projeto em C que implementa uma estrutura de dados de conjunto com uma AVL.
@@ -20,18 +21,10 @@ Adaptabilidade a Mudanças Dinâmicas: A árvore AVL é adaptável a mudanças d
 
 ### Compilação do Projeto
 
-Para compilar o projeto, basta executar o comando `make all` no terminal. Isso criará um executável chamado `conjunto` no diretório atual.
+Para compilar o projeto, basta executar o comando `make` no terminal. Isso criará um executável chamado `conjunto` no diretório atual.
 
 ```bash
-make all
-```
-
-### Execução
-
-Para executar os arquivos, basta executar o comando `make run` no terminal.
-
-```bash
-make all
+make
 ```
 
 ### Limpeza
@@ -63,3 +56,4 @@ sudo yum install zip       # Para sistemas baseados em Red Hat/Fedora
 ```
 
 Isso completa a documentação básica para compilar e usar este projeto em C.
+
