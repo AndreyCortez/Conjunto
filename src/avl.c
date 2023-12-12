@@ -70,6 +70,12 @@ NO *avl_cria_no(ITEM *item)
     return no;
 }
 
+bool avl_apaga_no(NO* no)
+{
+    item_apagar(no->item);
+    free(no);
+}
+
 NO *rodar_direita(NO *a)
 {
     NO *b = a->fesq;
@@ -214,6 +220,8 @@ NO *avl_remover_aux(NO **raiz, int chave)
 
     if (chave == item_get_chave((*raiz)->item))
     {
+        
+        // CASO 1 e 2: Nó possui um ou nenhum filho
         if ((*raiz)->fdir == NULL || (*raiz)->fesq == NULL)
         {
             NO *p = (*raiz);
@@ -226,8 +234,7 @@ NO *avl_remover_aux(NO **raiz, int chave)
                 (*raiz) = (*raiz)->fesq;
             }
 
-            // FIXME: tem um vazamento de memória bem aqui
-            // no_apagar(p);
+            avl_apaga_no(p);
         }
         // CASO 3: Nó tem dois filhos
         else
@@ -277,9 +284,6 @@ bool avl_remover(AVL *T, int chave)
         return false;
 
     avl_remover_aux(&T->raiz, chave);
-    // NO *(*raiz) = T->raiz;
-
-    // CASO 1 e 2: Nó possui um ou nenhum filho
 
     return true;
 }
